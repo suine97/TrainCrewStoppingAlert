@@ -124,7 +124,7 @@ namespace TrainCrewStoppingAlert
             // 
             RadioButton_SoundA_LoopPlay.AutoSize = true;
             RadioButton_SoundA_LoopPlay.Checked = true;
-            RadioButton_SoundA_LoopPlay.Location = new System.Drawing.Point(85, 51);
+            RadioButton_SoundA_LoopPlay.Location = new System.Drawing.Point(127, 51);
             RadioButton_SoundA_LoopPlay.Name = "RadioButton_SoundA_LoopPlay";
             RadioButton_SoundA_LoopPlay.Size = new System.Drawing.Size(76, 19);
             RadioButton_SoundA_LoopPlay.TabIndex = 7;
@@ -135,7 +135,7 @@ namespace TrainCrewStoppingAlert
             // RadioButton_SoundA_SinglePlay
             // 
             RadioButton_SoundA_SinglePlay.AutoSize = true;
-            RadioButton_SoundA_SinglePlay.Location = new System.Drawing.Point(6, 51);
+            RadioButton_SoundA_SinglePlay.Location = new System.Drawing.Point(48, 51);
             RadioButton_SoundA_SinglePlay.Name = "RadioButton_SoundA_SinglePlay";
             RadioButton_SoundA_SinglePlay.Size = new System.Drawing.Size(73, 19);
             RadioButton_SoundA_SinglePlay.TabIndex = 6;
@@ -171,7 +171,7 @@ namespace TrainCrewStoppingAlert
             // 
             RadioButton_SoundB_LoopPlay.AutoSize = true;
             RadioButton_SoundB_LoopPlay.Checked = true;
-            RadioButton_SoundB_LoopPlay.Location = new System.Drawing.Point(85, 51);
+            RadioButton_SoundB_LoopPlay.Location = new System.Drawing.Point(127, 51);
             RadioButton_SoundB_LoopPlay.Name = "RadioButton_SoundB_LoopPlay";
             RadioButton_SoundB_LoopPlay.Size = new System.Drawing.Size(76, 19);
             RadioButton_SoundB_LoopPlay.TabIndex = 12;
@@ -182,7 +182,7 @@ namespace TrainCrewStoppingAlert
             // RadioButton_SoundB_SinglePlay
             // 
             RadioButton_SoundB_SinglePlay.AutoSize = true;
-            RadioButton_SoundB_SinglePlay.Location = new System.Drawing.Point(6, 51);
+            RadioButton_SoundB_SinglePlay.Location = new System.Drawing.Point(48, 51);
             RadioButton_SoundB_SinglePlay.Name = "RadioButton_SoundB_SinglePlay";
             RadioButton_SoundB_SinglePlay.Size = new System.Drawing.Size(73, 19);
             RadioButton_SoundB_SinglePlay.TabIndex = 11;

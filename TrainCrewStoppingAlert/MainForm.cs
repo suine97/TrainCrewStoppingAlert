@@ -1,10 +1,8 @@
 using System;
 using System.Diagnostics;
-using System.Drawing.Text;
 using System.Windows.Forms;
 using TrainCrew;
 using XAudio2SoundManager;
-using static System.Windows.Forms.AxHost;
 
 namespace TrainCrewStoppingAlert
 {
@@ -268,6 +266,11 @@ namespace TrainCrewStoppingAlert
             _alertManager.UpdatePower(CheckBox_Power.Checked);
         }
 
+        /// <summary>
+        /// CheckBox_VolumeHalf_CheckedChangedイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckBox_VolumeHalf_CheckedChanged(object sender, EventArgs e)
         {
             bool _isVolumeHalf = CheckBox_VolumeHalf.Checked;
@@ -279,6 +282,11 @@ namespace TrainCrewStoppingAlert
                 _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), (_isVolumeHalf ? 0.5f : 1.0f));
         }
 
+        /// <summary>
+        /// CheckBox_SoundPlayB_CheckedChangedイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckBox_SoundPlayB_CheckedChanged(object sender, EventArgs e)
         {
             bool _isVolumeHalf = CheckBox_VolumeHalf.Checked;
@@ -290,6 +298,11 @@ namespace TrainCrewStoppingAlert
             {
                 _sound.SoundStop(ComboBox_SoundA.SelectedItem.ToString());
                 _sound.SoundPlay(ComboBox_SoundB.SelectedItem.ToString(), _isSoundBLoop, (_isVolumeHalf ? 0.5f : 1.0f));
+            }
+            else
+            {
+                _sound.SoundStop(ComboBox_SoundB.SelectedItem.ToString());
+                _sound.SoundPlay(ComboBox_SoundA.SelectedItem.ToString(), _isSoundALoop, (_isVolumeHalf ? 0.5f : 1.0f));
             }
         }
     }
