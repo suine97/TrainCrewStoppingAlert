@@ -12,6 +12,8 @@ namespace TrainCrewStoppingAlert
         private readonly Sound _sound;
         private readonly AlertManager _alertManager;
         private string _soundAlertPhase;
+        private bool _isPower;
+        private bool _isReset;
 
         /// <summary>
         /// コンストラクタ
@@ -26,15 +28,23 @@ namespace TrainCrewStoppingAlert
             // イベント設定
             FormClosing += MainForm_FormClosing;
             CheckBox_TopMost.CheckedChanged += CheckBox_TopMost_CheckedChanged;
-            CheckBox_Power.CheckedChanged += CheckBox_Power_CheckedChanged;
-            TrackBar_Volume.ValueChanged += TrackBar_Volume_ValueChanged;
+            TrackBar_MasterVolume.ValueChanged += TrackBar_Volume_ValueChanged;
 
-            _timer = InitializeTimer(100, Timer_Tick);
+            // インスタンス化
             _sound = Sound.Instance;
             _alertManager = new AlertManager();
-            _alertManager.UpdatePower(CheckBox_Power.Checked);
-            _sound.SetMasterVolume(TrackBar_Volume.Value * 0.1f);
+
+            // TrainCrewInput初期化
+            TrainCrewInput.Init();
+
+            // Timer初期化
+            _timer = InitializeTimer(100, Timer_Tick);
+
+            // 初期設定
+            _sound.SetMasterVolume(TrackBar_MasterVolume.Value * 0.1f);
             _soundAlertPhase = "音声再生待機";
+            _isPower = CheckBox_Power.Checked;
+            _isReset = false;
 
             // ComboBoxに音声ファイル名を設定
             foreach (var soundName in _sound.SoundSource.Keys)
@@ -44,8 +54,6 @@ namespace TrainCrewStoppingAlert
             }
             if (ComboBox_SoundA.Items.Count > 0) ComboBox_SoundA.SelectedIndex = 0;
             if (ComboBox_SoundB.Items.Count > 0) ComboBox_SoundB.SelectedIndex = 0;
-
-            TrainCrewInput.Init();
         }
 
         /// <summary>
@@ -84,6 +92,9 @@ namespace TrainCrewStoppingAlert
             try { var dataCheck = state.stationList[state.nowStaIndex].Name; }
             catch { return; }
 
+            // 電源投入状態の更新
+            _isPower = CheckBox_Power.Checked;
+
             try
             {
                 // 運転画面(運転・ポーズ中)なら処理
@@ -92,8 +103,24 @@ namespace TrainCrewStoppingAlert
                 {
                     SuspendLayout();
 
+                    // 電源未投入なら初期化して終了
+                    if (!_isPower)
+                    {
+                        if (!_isReset)
+                        {
+                            _alertManager.InitializeAlertPhase();
+                            _soundAlertPhase = "音声再生待機";
+                            _sound.SoundAllStop();
+                            _isReset = true;
+                        }
+                        return;
+                    }
+                    else if (_isPower && _isReset)
+                    {
+                        _isReset = false;
+                    }
+
                     // AlertManagerの停車予報更新
-                    _alertManager.UpdatePower(CheckBox_Power.Checked);
                     _alertManager.UpdateAlertPhase(state);
                     UpdateAlertPhaseLabel();
                     UpdateAlertSound();
@@ -106,8 +133,13 @@ namespace TrainCrewStoppingAlert
                     SuspendLayout();
 
                     // AlertManagerの停車予報初期化
-                    _alertManager.InitializeAlertPhase();
-                    _soundAlertPhase = "音声再生待機";
+                    if (!_isReset)
+                    {
+                        _alertManager.InitializeAlertPhase();
+                        _soundAlertPhase = "音声再生待機";
+                        _sound.SoundAllStop();
+                        _isReset = true;
+                    }
 
                     ResumeLayout();
                 }
@@ -148,14 +180,16 @@ namespace TrainCrewStoppingAlert
             bool _isSoundALoop = RadioButton_SoundA_LoopPlay.Checked;
             bool _isSoundBLoop = RadioButton_SoundB_LoopPlay.Checked;
             bool _isSoundPlayB = CheckBox_SoundPlayB.Checked;
+            float _soundAVolume = TrackBar_SoundAVolume.Value * 0.1f;
+            float _soundBVolume = TrackBar_SoundBVolume.Value * 0.1f;
 
             switch (_soundAlertPhase)
             {
                 case "音声再生待機":
-                    _sound.SoundAllStop();
                     if (_alertManager.AlertPhase == "停P受信")
                     {
-                        _sound.SoundPlay(ComboBox_SoundA.SelectedItem.ToString(), _isSoundALoop, (_isVolumeHalf ? 0.5f : 1.0f));
+                        System.Threading.Thread.Sleep(100);
+                        _sound.SoundPlay(ComboBox_SoundA.SelectedItem.ToString(), _isSoundALoop, _soundAVolume);
                         _soundAlertPhase = "停P音声再生";
                     }
                     break;
@@ -169,12 +203,13 @@ namespace TrainCrewStoppingAlert
                     if (_isSoundPlayB)
                     {
                         _sound.SoundStop(ComboBox_SoundA.SelectedItem.ToString());
-                        _sound.SoundPlay(ComboBox_SoundB.SelectedItem.ToString(), _isSoundBLoop, (_isVolumeHalf ? 0.5f : 1.0f));
+                        System.Threading.Thread.Sleep(100);
+                        _sound.SoundPlay(ComboBox_SoundB.SelectedItem.ToString(), _isSoundBLoop, _soundBVolume * (_isVolumeHalf ? 0.5f : 1.0f));
                         _soundAlertPhase = "停車待機";
                     }
                     else
                     {
-                        _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), (_isVolumeHalf ? 0.5f : 1.0f));
+                        _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), _soundAVolume * (_isVolumeHalf ? 0.5f : 1.0f));
                         _soundAlertPhase = "停車待機";
                     }
                     break;
@@ -210,14 +245,38 @@ namespace TrainCrewStoppingAlert
         }
 
         /// <summary>
-        /// 音量バーの値変更イベント
+        /// 全体音量バーの値変更イベント
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void TrackBar_Volume_ValueChanged(object sender, EventArgs e)
         {
-            Label_Volume.Text = $"{TrackBar_Volume.Value * 10}%";
-            _sound.SetMasterVolume(TrackBar_Volume.Value * 0.1f);
+            Label_MasterVolume.Text = $"{TrackBar_MasterVolume.Value * 10}%";
+            _sound.SetMasterVolume(TrackBar_MasterVolume.Value * 0.1f);
+        }
+
+        /// <summary>
+        /// 音声A音量バーの値変更イベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TrackBar_SoundAVolume_ValueChanged(object sender, EventArgs e)
+        {
+            bool _isVolumeHalf = CheckBox_VolumeHalf.Checked;
+            Label_SoundAVolume.Text = $"{TrackBar_SoundAVolume.Value * 10}%";
+            _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), TrackBar_SoundAVolume.Value * 0.1f * (_isVolumeHalf ? 0.5f : 1.0f));
+        }
+
+        /// <summary>
+        /// 音声B音量バーの値変更イベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TrackBar_SoundBVolume_ValueChanged(object sender, EventArgs e)
+        {
+            bool _isVolumeHalf = CheckBox_VolumeHalf.Checked;
+            Label_SoundBVolume.Text = $"{TrackBar_SoundBVolume.Value * 10}%";
+            _sound.SetVolume(ComboBox_SoundB.SelectedItem.ToString(), TrackBar_SoundBVolume.Value * 0.1f * (_isVolumeHalf ? 0.5f : 1.0f));
         }
 
         /// <summary>
@@ -228,9 +287,12 @@ namespace TrainCrewStoppingAlert
         private void Button_SoundA_TestPlay_Click(object sender, EventArgs e)
         {
             string _soundName = ComboBox_SoundA.SelectedItem.ToString();
+            float _volume = TrackBar_SoundAVolume.Value * 0.1f;
             try
             {
-                _sound.SoundPlay(_soundName, false);
+                _sound.SoundStop(_soundName);
+                System.Threading.Thread.Sleep(100);
+                _sound.SoundPlay(_soundName, false, _volume * _sound.fMasterVolume);
             }
             catch
             {
@@ -246,24 +308,17 @@ namespace TrainCrewStoppingAlert
         private void Button_SoundB_TestPlay_Click(object sender, EventArgs e)
         {
             string _soundName = ComboBox_SoundB.SelectedItem.ToString();
+            float _volume = TrackBar_SoundBVolume.Value * 0.1f;
             try
             {
-                _sound.SoundPlay(_soundName, false);
+                _sound.SoundStop(_soundName);
+                System.Threading.Thread.Sleep(100);
+                _sound.SoundPlay(_soundName, false, _volume * _sound.fMasterVolume);
             }
             catch
             {
                 MessageBox.Show("音声再生に失敗しました。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        /// <summary>
-        /// CheckBox_Power_CheckedChangedイベント
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CheckBox_Power_CheckedChanged(object sender, EventArgs e)
-        {
-            _alertManager.UpdatePower(CheckBox_Power.Checked);
         }
 
         /// <summary>
@@ -275,11 +330,24 @@ namespace TrainCrewStoppingAlert
         {
             bool _isVolumeHalf = CheckBox_VolumeHalf.Checked;
             bool _isSoundPlayB = CheckBox_SoundPlayB.Checked;
+            float _soundAVolume = TrackBar_SoundAVolume.Value * 0.1f;
+            float _soundBVolume = TrackBar_SoundBVolume.Value * 0.1f;
 
-            if (_isSoundPlayB)
-                _sound.SetVolume(ComboBox_SoundB.SelectedItem.ToString(), (_isVolumeHalf ? 0.5f : 1.0f));
-            else
-                _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), (_isVolumeHalf ? 0.5f : 1.0f));
+            switch (_alertManager.AlertPhase)
+            {
+                case "ブレーキ投入":
+                    if (_isSoundPlayB)
+                        _sound.SetVolume(ComboBox_SoundB.SelectedItem.ToString(), _soundBVolume * (_isVolumeHalf ? 0.5f : 1.0f));
+                    else
+                        _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), _soundAVolume * (_isVolumeHalf ? 0.5f : 1.0f));
+                    break;
+                default:
+                    if (_isSoundPlayB)
+                        _sound.SetVolume(ComboBox_SoundB.SelectedItem.ToString(), _soundBVolume);
+                    else
+                        _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), _soundAVolume);
+                    break;
+            }
         }
 
         /// <summary>
@@ -293,16 +361,27 @@ namespace TrainCrewStoppingAlert
             bool _isSoundALoop = RadioButton_SoundA_LoopPlay.Checked;
             bool _isSoundBLoop = RadioButton_SoundB_LoopPlay.Checked;
             bool _isSoundPlayB = CheckBox_SoundPlayB.Checked;
+            float _soundAVolume = TrackBar_SoundAVolume.Value * 0.1f;
+            float _soundBVolume = TrackBar_SoundBVolume.Value * 0.1f;
 
-            if (_isSoundPlayB)
+            switch (_alertManager.AlertPhase)
             {
-                _sound.SoundStop(ComboBox_SoundA.SelectedItem.ToString());
-                _sound.SoundPlay(ComboBox_SoundB.SelectedItem.ToString(), _isSoundBLoop, (_isVolumeHalf ? 0.5f : 1.0f));
-            }
-            else
-            {
-                _sound.SoundStop(ComboBox_SoundB.SelectedItem.ToString());
-                _sound.SoundPlay(ComboBox_SoundA.SelectedItem.ToString(), _isSoundALoop, (_isVolumeHalf ? 0.5f : 1.0f));
+                case "ブレーキ投入":
+                    if (_isSoundPlayB)
+                    {
+                        _sound.SoundStop(ComboBox_SoundA.SelectedItem.ToString());
+                        System.Threading.Thread.Sleep(100);
+                        _sound.SoundPlay(ComboBox_SoundB.SelectedItem.ToString(), _isSoundBLoop, _soundBVolume * (_isVolumeHalf ? 0.5f : 1.0f));
+                    }
+                    else
+                    {
+                        _sound.SoundStop(ComboBox_SoundB.SelectedItem.ToString());
+                        System.Threading.Thread.Sleep(100);
+                        _sound.SoundPlay(ComboBox_SoundA.SelectedItem.ToString(), _isSoundALoop, _soundAVolume * (_isVolumeHalf ? 0.5f : 1.0f));
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

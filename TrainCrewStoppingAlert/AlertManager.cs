@@ -12,7 +12,6 @@ namespace TrainCrewStoppingAlert
     public class AlertManager
     {
         private CancellationTokenSource? _cts;
-        private bool _isPower;
         private bool _isStationStopped;
 
         public string AlertPhase;
@@ -63,15 +62,6 @@ namespace TrainCrewStoppingAlert
         }
 
         /// <summary>
-        /// 電源状態更新メソッド
-        /// </summary>
-        /// <param name="isPower"></param>
-        public void UpdatePower(bool isPower)
-        {
-            _isPower = isPower;
-        }
-
-        /// <summary>
         /// 停車予報更新メソッド
         /// </summary>
         /// <param name="_state"></param>
@@ -81,13 +71,6 @@ namespace TrainCrewStoppingAlert
             {
                 // 駅停車判定
                 _isStationStopped = (-3.0f < _state.nextStaDistance && _state.nextStaDistance < 3.0f) && FloatExtensions.IsZero(_state.Speed);
-
-                // 電源未投入なら初期化して終了
-                if (!_isPower)
-                {
-                    InitializeAlertPhase();
-                    return;
-                }
 
                 switch (AlertPhase)
                 {
@@ -112,7 +95,6 @@ namespace TrainCrewStoppingAlert
                         // 停止範囲内に停止後、5秒経過で動作完了
                         else if (_isStationStopped)
                         {
-                            CancelWaitFor();
                             _ = WaitForAsync(5.0f, () => InitializeAlertPhase(), _cts.Token);
                         }
                         else
@@ -129,7 +111,6 @@ namespace TrainCrewStoppingAlert
                         // 停止範囲内に停止後、5秒経過で動作完了
                         else if (_isStationStopped)
                         {
-                            CancelWaitFor();
                             _ = WaitForAsync(5.0f, () => InitializeAlertPhase(), _cts.Token);
                         }
                         else

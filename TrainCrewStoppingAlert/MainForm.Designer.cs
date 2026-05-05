@@ -34,23 +34,29 @@ namespace TrainCrewStoppingAlert
             CheckBox_VolumeHalf = new CheckBox();
             CheckBox_SoundPlayB = new CheckBox();
             GroupBox_SoundA = new GroupBox();
+            Label_SoundAVolume = new Label();
+            TrackBar_SoundAVolume = new TrackBar();
             Button_SoundA_TestPlay = new Button();
             ComboBox_SoundA = new ComboBox();
             RadioButton_SoundA_LoopPlay = new RadioButton();
             RadioButton_SoundA_SinglePlay = new RadioButton();
             GroupBox_SoundB = new GroupBox();
+            Label_SoundBVolume = new Label();
+            TrackBar_SoundBVolume = new TrackBar();
             Button_SoundB_TestPlay = new Button();
             RadioButton_SoundB_LoopPlay = new RadioButton();
             RadioButton_SoundB_SinglePlay = new RadioButton();
             ComboBox_SoundB = new ComboBox();
-            TrackBar_Volume = new TrackBar();
+            TrackBar_MasterVolume = new TrackBar();
             GroupBox_Volume = new GroupBox();
-            Label_Volume = new Label();
+            Label_MasterVolume = new Label();
             Label_AlertPhase = new Label();
             CheckBox_Power = new CheckBox();
             GroupBox_SoundA.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)TrackBar_SoundAVolume).BeginInit();
             GroupBox_SoundB.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)TrackBar_Volume).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)TrackBar_SoundBVolume).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)TrackBar_MasterVolume).BeginInit();
             GroupBox_Volume.SuspendLayout();
             SuspendLayout();
             // 
@@ -89,6 +95,8 @@ namespace TrainCrewStoppingAlert
             // 
             // GroupBox_SoundA
             // 
+            GroupBox_SoundA.Controls.Add(Label_SoundAVolume);
+            GroupBox_SoundA.Controls.Add(TrackBar_SoundAVolume);
             GroupBox_SoundA.Controls.Add(Button_SoundA_TestPlay);
             GroupBox_SoundA.Controls.Add(ComboBox_SoundA);
             GroupBox_SoundA.Controls.Add(RadioButton_SoundA_LoopPlay);
@@ -99,6 +107,26 @@ namespace TrainCrewStoppingAlert
             GroupBox_SoundA.TabIndex = 4;
             GroupBox_SoundA.TabStop = false;
             GroupBox_SoundA.Text = "音声A";
+            // 
+            // Label_SoundAVolume
+            // 
+            Label_SoundAVolume.Location = new System.Drawing.Point(167, 51);
+            Label_SoundAVolume.Name = "Label_SoundAVolume";
+            Label_SoundAVolume.Size = new System.Drawing.Size(81, 22);
+            Label_SoundAVolume.TabIndex = 12;
+            Label_SoundAVolume.Text = "100%";
+            Label_SoundAVolume.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TrackBar_SoundAVolume
+            // 
+            TrackBar_SoundAVolume.AutoSize = false;
+            TrackBar_SoundAVolume.LargeChange = 1;
+            TrackBar_SoundAVolume.Location = new System.Drawing.Point(167, 22);
+            TrackBar_SoundAVolume.Name = "TrackBar_SoundAVolume";
+            TrackBar_SoundAVolume.Size = new System.Drawing.Size(81, 34);
+            TrackBar_SoundAVolume.TabIndex = 11;
+            TrackBar_SoundAVolume.Value = 10;
+            TrackBar_SoundAVolume.ValueChanged += TrackBar_SoundAVolume_ValueChanged;
             // 
             // Button_SoundA_TestPlay
             // 
@@ -117,14 +145,14 @@ namespace TrainCrewStoppingAlert
             ComboBox_SoundA.FormattingEnabled = true;
             ComboBox_SoundA.Location = new System.Drawing.Point(6, 22);
             ComboBox_SoundA.Name = "ComboBox_SoundA";
-            ComboBox_SoundA.Size = new System.Drawing.Size(242, 23);
+            ComboBox_SoundA.Size = new System.Drawing.Size(155, 23);
             ComboBox_SoundA.TabIndex = 9;
             // 
             // RadioButton_SoundA_LoopPlay
             // 
             RadioButton_SoundA_LoopPlay.AutoSize = true;
             RadioButton_SoundA_LoopPlay.Checked = true;
-            RadioButton_SoundA_LoopPlay.Location = new System.Drawing.Point(127, 51);
+            RadioButton_SoundA_LoopPlay.Location = new System.Drawing.Point(85, 51);
             RadioButton_SoundA_LoopPlay.Name = "RadioButton_SoundA_LoopPlay";
             RadioButton_SoundA_LoopPlay.Size = new System.Drawing.Size(76, 19);
             RadioButton_SoundA_LoopPlay.TabIndex = 7;
@@ -135,7 +163,7 @@ namespace TrainCrewStoppingAlert
             // RadioButton_SoundA_SinglePlay
             // 
             RadioButton_SoundA_SinglePlay.AutoSize = true;
-            RadioButton_SoundA_SinglePlay.Location = new System.Drawing.Point(48, 51);
+            RadioButton_SoundA_SinglePlay.Location = new System.Drawing.Point(6, 51);
             RadioButton_SoundA_SinglePlay.Name = "RadioButton_SoundA_SinglePlay";
             RadioButton_SoundA_SinglePlay.Size = new System.Drawing.Size(73, 19);
             RadioButton_SoundA_SinglePlay.TabIndex = 6;
@@ -144,6 +172,8 @@ namespace TrainCrewStoppingAlert
             // 
             // GroupBox_SoundB
             // 
+            GroupBox_SoundB.Controls.Add(Label_SoundBVolume);
+            GroupBox_SoundB.Controls.Add(TrackBar_SoundBVolume);
             GroupBox_SoundB.Controls.Add(Button_SoundB_TestPlay);
             GroupBox_SoundB.Controls.Add(RadioButton_SoundB_LoopPlay);
             GroupBox_SoundB.Controls.Add(RadioButton_SoundB_SinglePlay);
@@ -154,6 +184,26 @@ namespace TrainCrewStoppingAlert
             GroupBox_SoundB.TabIndex = 5;
             GroupBox_SoundB.TabStop = false;
             GroupBox_SoundB.Text = "音声B";
+            // 
+            // Label_SoundBVolume
+            // 
+            Label_SoundBVolume.Location = new System.Drawing.Point(167, 51);
+            Label_SoundBVolume.Name = "Label_SoundBVolume";
+            Label_SoundBVolume.Size = new System.Drawing.Size(81, 22);
+            Label_SoundBVolume.TabIndex = 15;
+            Label_SoundBVolume.Text = "100%";
+            Label_SoundBVolume.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TrackBar_SoundBVolume
+            // 
+            TrackBar_SoundBVolume.AutoSize = false;
+            TrackBar_SoundBVolume.LargeChange = 1;
+            TrackBar_SoundBVolume.Location = new System.Drawing.Point(167, 22);
+            TrackBar_SoundBVolume.Name = "TrackBar_SoundBVolume";
+            TrackBar_SoundBVolume.Size = new System.Drawing.Size(81, 34);
+            TrackBar_SoundBVolume.TabIndex = 14;
+            TrackBar_SoundBVolume.Value = 10;
+            TrackBar_SoundBVolume.ValueChanged += TrackBar_SoundBVolume_ValueChanged;
             // 
             // Button_SoundB_TestPlay
             // 
@@ -171,7 +221,7 @@ namespace TrainCrewStoppingAlert
             // 
             RadioButton_SoundB_LoopPlay.AutoSize = true;
             RadioButton_SoundB_LoopPlay.Checked = true;
-            RadioButton_SoundB_LoopPlay.Location = new System.Drawing.Point(127, 51);
+            RadioButton_SoundB_LoopPlay.Location = new System.Drawing.Point(85, 51);
             RadioButton_SoundB_LoopPlay.Name = "RadioButton_SoundB_LoopPlay";
             RadioButton_SoundB_LoopPlay.Size = new System.Drawing.Size(76, 19);
             RadioButton_SoundB_LoopPlay.TabIndex = 12;
@@ -182,7 +232,7 @@ namespace TrainCrewStoppingAlert
             // RadioButton_SoundB_SinglePlay
             // 
             RadioButton_SoundB_SinglePlay.AutoSize = true;
-            RadioButton_SoundB_SinglePlay.Location = new System.Drawing.Point(48, 51);
+            RadioButton_SoundB_SinglePlay.Location = new System.Drawing.Point(6, 51);
             RadioButton_SoundB_SinglePlay.Name = "RadioButton_SoundB_SinglePlay";
             RadioButton_SoundB_SinglePlay.Size = new System.Drawing.Size(73, 19);
             RadioButton_SoundB_SinglePlay.TabIndex = 11;
@@ -194,39 +244,39 @@ namespace TrainCrewStoppingAlert
             ComboBox_SoundB.FormattingEnabled = true;
             ComboBox_SoundB.Location = new System.Drawing.Point(6, 22);
             ComboBox_SoundB.Name = "ComboBox_SoundB";
-            ComboBox_SoundB.Size = new System.Drawing.Size(242, 23);
+            ComboBox_SoundB.Size = new System.Drawing.Size(155, 23);
             ComboBox_SoundB.TabIndex = 10;
             // 
-            // TrackBar_Volume
+            // TrackBar_MasterVolume
             // 
-            TrackBar_Volume.AutoSize = false;
-            TrackBar_Volume.LargeChange = 1;
-            TrackBar_Volume.Location = new System.Drawing.Point(6, 21);
-            TrackBar_Volume.Name = "TrackBar_Volume";
-            TrackBar_Volume.Size = new System.Drawing.Size(191, 34);
-            TrackBar_Volume.TabIndex = 8;
-            TrackBar_Volume.Value = 10;
-            TrackBar_Volume.ValueChanged += TrackBar_Volume_ValueChanged;
+            TrackBar_MasterVolume.AutoSize = false;
+            TrackBar_MasterVolume.LargeChange = 1;
+            TrackBar_MasterVolume.Location = new System.Drawing.Point(6, 21);
+            TrackBar_MasterVolume.Name = "TrackBar_MasterVolume";
+            TrackBar_MasterVolume.Size = new System.Drawing.Size(191, 34);
+            TrackBar_MasterVolume.TabIndex = 8;
+            TrackBar_MasterVolume.Value = 10;
+            TrackBar_MasterVolume.ValueChanged += TrackBar_Volume_ValueChanged;
             // 
             // GroupBox_Volume
             // 
-            GroupBox_Volume.Controls.Add(Label_Volume);
-            GroupBox_Volume.Controls.Add(TrackBar_Volume);
+            GroupBox_Volume.Controls.Add(Label_MasterVolume);
+            GroupBox_Volume.Controls.Add(TrackBar_MasterVolume);
             GroupBox_Volume.Location = new System.Drawing.Point(12, 12);
             GroupBox_Volume.Name = "GroupBox_Volume";
             GroupBox_Volume.Size = new System.Drawing.Size(203, 62);
             GroupBox_Volume.TabIndex = 9;
             GroupBox_Volume.TabStop = false;
-            GroupBox_Volume.Text = "音量";
+            GroupBox_Volume.Text = "全体音量";
             // 
-            // Label_Volume
+            // Label_MasterVolume
             // 
-            Label_Volume.Location = new System.Drawing.Point(39, -4);
-            Label_Volume.Name = "Label_Volume";
-            Label_Volume.Size = new System.Drawing.Size(37, 22);
-            Label_Volume.TabIndex = 10;
-            Label_Volume.Text = "100%";
-            Label_Volume.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            Label_MasterVolume.Location = new System.Drawing.Point(63, -4);
+            Label_MasterVolume.Name = "Label_MasterVolume";
+            Label_MasterVolume.Size = new System.Drawing.Size(37, 22);
+            Label_MasterVolume.TabIndex = 10;
+            Label_MasterVolume.Text = "100%";
+            Label_MasterVolume.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // Label_AlertPhase
             // 
@@ -269,9 +319,11 @@ namespace TrainCrewStoppingAlert
             Text = "TrainCrewStoppingAlert";
             GroupBox_SoundA.ResumeLayout(false);
             GroupBox_SoundA.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)TrackBar_SoundAVolume).EndInit();
             GroupBox_SoundB.ResumeLayout(false);
             GroupBox_SoundB.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)TrackBar_Volume).EndInit();
+            ((System.ComponentModel.ISupportInitialize)TrackBar_SoundBVolume).EndInit();
+            ((System.ComponentModel.ISupportInitialize)TrackBar_MasterVolume).EndInit();
             GroupBox_Volume.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -284,16 +336,20 @@ namespace TrainCrewStoppingAlert
         private GroupBox GroupBox_SoundB;
         private RadioButton RadioButton_SoundA_SinglePlay;
         private RadioButton RadioButton_SoundA_LoopPlay;
-        private TrackBar TrackBar_Volume;
+        private TrackBar TrackBar_MasterVolume;
         private ComboBox ComboBox_SoundA;
         private ComboBox ComboBox_SoundB;
         private RadioButton RadioButton_SoundB_LoopPlay;
         private RadioButton RadioButton_SoundB_SinglePlay;
         private GroupBox GroupBox_Volume;
-        private Label Label_Volume;
+        private Label Label_MasterVolume;
         private Button Button_SoundA_TestPlay;
         private Button Button_SoundB_TestPlay;
         private Label Label_AlertPhase;
         private CheckBox CheckBox_Power;
+        private TrackBar TrackBar_SoundAVolume;
+        private Label Label_SoundAVolume;
+        private Label Label_SoundBVolume;
+        private TrackBar TrackBar_SoundBVolume;
     }
 }
