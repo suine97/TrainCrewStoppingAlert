@@ -18,6 +18,7 @@ namespace XAudio2SoundManager
 
         private XAudio2 xAudio2;
         private MasteringVoice masteringVoice;
+        private Dictionary<string, float> SoundVolumeList = new();
         public Dictionary<string, SourceVoice> SoundSource = new();
         public Dictionary<string, AudioBuffer> SoundBuffer = new();
         public Dictionary<int, string> SoundData = new();
@@ -89,6 +90,7 @@ namespace XAudio2SoundManager
                         var fileName = Path.GetFileNameWithoutExtension(filePath);
                         SoundSource[fileName] = sourceVoice;
                         SoundBuffer[fileName] = buffer;
+                        SoundVolumeList[fileName] = 1.0f;
                     }
                 }
             }
@@ -115,8 +117,6 @@ namespace XAudio2SoundManager
             SoundSource.Clear();
             SoundBuffer.Clear();
         }
-
-
 
         /// <summary>
         /// 音声再生メソッド
@@ -194,6 +194,7 @@ namespace XAudio2SoundManager
             if (!SoundSource.ContainsKey(fileName) || SoundSource[fileName] == null) return;
             if (volume < 0) volume = 0;
             SoundSource[fileName].SetVolume(fMasterVolume * fFadeVolume * volume);
+            SoundVolumeList[fileName] = volume;
         }
 
         /// <summary>
@@ -228,11 +229,11 @@ namespace XAudio2SoundManager
             fMasterVolume = volume;
 
             // 全ての音声にマスターボリュームを設定
-            foreach (var sourceVoice in SoundSource.Values)
+            foreach (var source in SoundSource)
             {
-                if (sourceVoice != null)
+                if (source.Value != null)
                 {
-                    sourceVoice.SetVolume(fMasterVolume * fFadeVolume);
+                    source.Value.SetVolume(fMasterVolume * fFadeVolume * SoundVolumeList[source.Key]);
                 }
             }
         }
