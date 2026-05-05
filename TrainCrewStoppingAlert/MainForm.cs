@@ -54,6 +54,9 @@ namespace TrainCrewStoppingAlert
             }
             if (ComboBox_SoundA.Items.Count > 0) ComboBox_SoundA.SelectedIndex = 0;
             if (ComboBox_SoundB.Items.Count > 0) ComboBox_SoundB.SelectedIndex = 0;
+
+            // 設定ファイル読み込み
+            InportSettingFile();
         }
 
         /// <summary>
@@ -224,12 +227,126 @@ namespace TrainCrewStoppingAlert
         }
 
         /// <summary>
+        /// UI設定をSetting.iniから読み込むメソッド
+        /// </summary>
+        private void InportSettingFile()
+        {
+            string settingFilePath = ".\\Setting.ini";
+
+            try
+            {
+                if (!System.IO.File.Exists(settingFilePath))
+                {
+                    return;
+                }
+
+                var lines = System.IO.File.ReadAllLines(settingFilePath);
+                foreach (var line in lines)
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("[") || line.StartsWith(";"))
+                    {
+                        continue;
+                    }
+
+                    var parts = line.Split('=');
+                    if (parts.Length != 2)
+                    {
+                        continue;
+                    }
+
+                    var key = parts[0].Trim();
+                    var value = parts[1].Trim();
+
+                    switch (key)
+                    {
+                        case "TopMost":
+                            if (bool.TryParse(value, out bool topMost))
+                            {
+                                CheckBox_TopMost.Checked = topMost;
+                            }
+                            break;
+                        case "MasterVolume":
+                            if (int.TryParse(value, out int masterVolume))
+                            {
+                                TrackBar_MasterVolume.Value = Math.Clamp(masterVolume, TrackBar_MasterVolume.Minimum, TrackBar_MasterVolume.Maximum);
+                            }
+                            break;
+                        case "SoundAVolume":
+                            if (int.TryParse(value, out int soundAVolume))
+                            {
+                                TrackBar_SoundAVolume.Value = Math.Clamp(soundAVolume, TrackBar_SoundAVolume.Minimum, TrackBar_SoundAVolume.Maximum);
+                            }
+                            break;
+                        case "SoundBVolume":
+                            if (int.TryParse(value, out int soundBVolume))
+                            {
+                                TrackBar_SoundBVolume.Value = Math.Clamp(soundBVolume, TrackBar_SoundBVolume.Minimum, TrackBar_SoundBVolume.Maximum);
+                            }
+                            break;
+                        case "Power":
+                            if (bool.TryParse(value, out bool power))
+                            {
+                                CheckBox_Power.Checked = power;
+                            }
+                            break;
+                        case "VolumeHalf":
+                            if (bool.TryParse(value, out bool volumeHalf))
+                            {
+                                CheckBox_VolumeHalf.Checked = volumeHalf;
+                            }
+                            break;
+                        case "SoundPlayB":
+                            if (bool.TryParse(value, out bool soundPlayB))
+                            {
+                                CheckBox_SoundPlayB.Checked = soundPlayB;
+                            }
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"設定ファイル読み込みエラー: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// UI設定をSetting.iniに出力するメソッド
+        /// </summary>
+        private void ExportSettingFile()
+        {
+            string settingFilePath = ".\\Setting.ini";
+
+            try
+            {
+                var lines = new System.Collections.Generic.List<string>
+                {
+                    "[UI]",
+                    $"TopMost={CheckBox_TopMost.Checked}",
+                    $"MasterVolume={TrackBar_MasterVolume.Value}",
+                    $"SoundAVolume={TrackBar_SoundAVolume.Value}",
+                    $"SoundBVolume={TrackBar_SoundBVolume.Value}",
+                    $"Power={CheckBox_Power.Checked}",
+                    $"VolumeHalf={CheckBox_VolumeHalf.Checked}",
+                    $"SoundPlayB={CheckBox_SoundPlayB.Checked}"
+                };
+
+                System.IO.File.WriteAllLines(settingFilePath, lines);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"設定ファイル保存エラー: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// MainForm_FormClosingイベント
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            ExportSettingFile();
             TrainCrewInput.Dispose();
             _sound.Dispose();
         }
@@ -264,7 +381,10 @@ namespace TrainCrewStoppingAlert
         {
             bool _isVolumeHalf = CheckBox_VolumeHalf.Checked;
             Label_SoundAVolume.Text = $"{TrackBar_SoundAVolume.Value * 10}%";
-            _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), TrackBar_SoundAVolume.Value * 0.1f * (_isVolumeHalf ? 0.5f : 1.0f));
+            if (ComboBox_SoundA.SelectedItem != null)
+            {
+                _sound.SetVolume(ComboBox_SoundA.SelectedItem.ToString(), TrackBar_SoundAVolume.Value * 0.1f * (_isVolumeHalf ? 0.5f : 1.0f));
+            }
         }
 
         /// <summary>
@@ -276,7 +396,10 @@ namespace TrainCrewStoppingAlert
         {
             bool _isVolumeHalf = CheckBox_VolumeHalf.Checked;
             Label_SoundBVolume.Text = $"{TrackBar_SoundBVolume.Value * 10}%";
-            _sound.SetVolume(ComboBox_SoundB.SelectedItem.ToString(), TrackBar_SoundBVolume.Value * 0.1f * (_isVolumeHalf ? 0.5f : 1.0f));
+            if (ComboBox_SoundB.SelectedItem != null)
+            {
+                _sound.SetVolume(ComboBox_SoundB.SelectedItem.ToString(), TrackBar_SoundBVolume.Value * 0.1f * (_isVolumeHalf ? 0.5f : 1.0f));
+            }
         }
 
         /// <summary>
